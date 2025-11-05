@@ -18,6 +18,11 @@
 !/storage/framework/views/.gitkeep
 !/bootstrap/cache/
 !/bootstrap/cache/.gitkeep
+#! Allow storing a single .gitkeep for storage/app/public/uploads so the directory exists in the repo
+!/storage/app/
+!/storage/app/public/
+!/storage/app/public/uploads/
+!/storage/app/public/uploads/.gitkeep
 /vendor
 /.idea
 /.vagrant
