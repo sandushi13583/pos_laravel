@@ -2,8 +2,7 @@
 /public/hot
 /public/storage
 /storage/*.key
-# Ignore contents of storage but allow specific .gitkeep files and framework dirs
-/storage/*
+/storage/
 # Keep empty storage directories in git so Laravel has valid cache paths on deploy
 #! When ignoring the whole storage directory, explicitly allow the .gitkeep files
 !/storage/.gitkeep
