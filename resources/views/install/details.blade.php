@@ -53,7 +53,7 @@
 
                 <h4> License Details <small class="text-danger">Make sure to provide correct information from Envato/codecanyon</small></h4>
                 <hr/>
-
+                 <!--
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="envato_purchase_code">Envato Purchase Code:*</label>
@@ -83,7 +83,7 @@
                     </div>
                   @endif
                   
-                  <div class="clearfix"></div>
+                  <div class="clearfix"></div>  -->
                   
                   <h4> Database Details <small>Make sure to provide correct information</small></h4>
                   <hr/>
@@ -122,7 +122,7 @@
                         <input type="password" class="form-control" id="db_password" name="DB_PASSWORD" required>
                     </div>
                   </div>
-
+<!--
                   <div class="clearfix"></div>
 
                   <h4>Email Configuration<small> Use for sending mails</small></h4>
@@ -185,7 +185,7 @@
                         <label for="MAIL_PASSWORD">SMTP Password:*</label>
                         <input type="password" class="form-control smtp_input" id="MAIL_PASSWORD" name="MAIL_PASSWORD" required disabled>
                     </div>
-                  </div>
+                  </div> -->
 
                   <hr/>
 
