@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+# Ensure runtime upload directories and symlink exist on dyno start.
+# This runs for each web dyno and complements the Procfile release step.
+APP_DIR="$PWD"
+mkdir -p "$APP_DIR/storage/app/public/uploads"
+
+# Try Laravel's storage link (creates public/storage -> storage/app/public)
+php artisan storage:link || true
+
+# Create/refresh public/uploads -> storage/app/public/uploads
+ln -sfn "$APP_DIR/storage/app/public/uploads" "$APP_DIR/public/uploads" || true
+
+# Try to set permissive permissions (may be no-op on some Heroku filesystems)
+chmod -R 0777 "$APP_DIR/storage/app/public/uploads" "$APP_DIR/public/uploads" || true
+
+# Start the default heroku PHP webserver
+exec vendor/bin/heroku-php-apache2 public/
