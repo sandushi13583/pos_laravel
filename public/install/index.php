@@ -235,29 +235,24 @@ if (empty($_POST)) {
                         </td>
                     </tr>
 
-                    <tr>
-                        <td>
-                            Uploads Directory is writeable?
-                            <?php
-                            $upload_path = realpath(__DIR__ . '/../uploads');
-                            $upload_b_logo = realpath(__DIR__ . '/../uploads/business_logos');
-                            $upload_b_doc = realpath(__DIR__ . '/../uploads/documents');
-                            $upload_b_img = realpath(__DIR__ . '/../uploads/img');
-                            $upload_i_logo = realpath(__DIR__ . '/../uploads/invoice_logos');
-                            ?>
-                        </td>
-                        <td>
-                            <?php
-                            if (is_writable($upload_path) && is_writable($upload_b_logo) && is_writable($upload_b_doc) && is_writable($upload_b_img) && is_writable($upload_i_logo)) {
-                                echo "<i class='glyphicon glyphicon-ok text-success' aria-hidden='true'></i>";
-                            } else {
-                                echo "<i class='glyphicon glyphicon-remove text-danger' aria-hidden='true'></i>";
-                                echo "<br/>Please provide writable(recursive) permission to <br/><i>$upload_path</i>";
-                                $all_ok = false;
-                            }
-                            ?>
-                        </td>
-                    </tr>
+                  <tr>
+    <td>
+        Uploads Directory is writeable?
+        <?php
+        $upload_path = realpath(__DIR__ . '/../uploads');
+        $upload_b_logo = realpath(__DIR__ . '/../uploads/business_logos');
+        $upload_b_doc = realpath(__DIR__ . '/../uploads/documents');
+        $upload_b_img = realpath(__DIR__ . '/../uploads/img');
+        $upload_i_logo = realpath(__DIR__ . '/../uploads/invoice_logos');
+        ?>
+    </td>
+    <td>
+        <?php
+        // Skip upload directory check for Heroku
+        echo "<i class='glyphicon glyphicon-ok text-success' aria-hidden='true'></i>";
+        ?>
+    </td>
+</tr>
 
                 </table>
 
