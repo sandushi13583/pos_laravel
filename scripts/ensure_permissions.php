@@ -61,6 +61,16 @@ if (!file_exists($storageUploads)) {
     @mkdir($storageUploads, 0777, true);
 }
 
+// Create common upload subfolders used by the application
+$subdirs = ['img', 'media', 'documents', 'business_logos', 'invoice_logos', 'UltimatePOS', 'temp'];
+foreach ($subdirs as $sd) {
+    $p = $storageUploads . DIRECTORY_SEPARATOR . $sd;
+    if (!file_exists($p)) {
+        @mkdir($p, 0777, true);
+    }
+    @chmod($p, 0777);
+}
+
 // If a non-symlink public/uploads exists, remove it so we can create a symlink
 if (file_exists($publicUploads) && !is_link($publicUploads)) {
     // attempt recursive removal
@@ -81,5 +91,4 @@ if (!is_link($publicUploads)) {
 @chmod($publicUploads, 0777);
 
 echo "Permission ensure script completed.\n";
-exit(0);
 exit(0);
