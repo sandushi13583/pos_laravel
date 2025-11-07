@@ -214,14 +214,11 @@ class InstallController extends Controller
             }
 
             //pos boot
-            // If the user provided a purchase code, verify it via pos_boot.
-            // If they left it blank (common for quick/heroku deploys), skip the
-            // remote license validation so the installer can proceed.
-            if (! empty($input['ENVATO_PURCHASE_CODE'])) {
-                $return = pos_boot($input['APP_URL'], __DIR__, $input['ENVATO_PURCHASE_CODE'], $input['ENVATO_EMAIL'], $input['ENVATO_USERNAME']);
-                if (! empty($return)) {
-                    return $return;
-                }
+            // pos_boot may accept empty strings for envato/email/username. Ensure
+            // we pass string values to avoid undefined index notices.
+            $return = pos_boot($input['APP_URL'], __DIR__, $input['ENVATO_PURCHASE_CODE'] ?? '', $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '');
+            if (! empty($return)) {
+                return $return;
             }
 
             //Check for activation key
@@ -252,34 +249,32 @@ class InstallController extends Controller
                 }
             }
 
-            // Automate the process of creating the .env file, running migrations,
-            // and redirecting to the success page. If writing the .env fails,
-            // fall back to showing the env text so the user can copy it manually.
-            $envContent = implode('', $env_lines);
+            //TODO: Remove false & automate the process of creating .env file.
+                    // Write the .env file, generate app key, run migrations and seed.
+                    try {
+                        $fp = fopen($envPath, 'w');
+                        fwrite($fp, implode('', $env_lines));
+                        fclose($fp);
 
-            try {
-                // Write the .env file
-                $fp = fopen($envPath, 'w');
-                if ($fp === false) {
-                    // Could not open file for writing. Show env text as fallback.
-                    throw new \Exception('Unable to open .env for writing.');
-                }
-                fwrite($fp, $envContent);
-                fclose($fp);
+                        // Generate APP_KEY
+                        Artisan::call('key:generate');
 
-                // Run migrations/seeds and other setup commands
-                $this->runArtisanCommands();
+                        // Run migrations and seed
+                        $this->runArtisanCommands();
 
-                return redirect()->route('install.success');
-            } catch (\Exception $e) {
-                // If anything failed (permission, DB, etc.) remove any partial .env
-                // and show the env contents so the user can create the file manually.
-                $this->deleteEnv();
+                        return redirect()->route('install.success');
+                    } catch (\Exception $e) {
+                        // If writing .env or running commands failed, delete any partial .env
+                        // and show user the generated content with instructions to create it
+                        // manually.
+                        $this->deleteEnv();
 
-                return view('install.envText')
-                    ->with(compact('envContent', 'envPath'))
-                    ->with('error', $e->getMessage());
-            }
+                        $envContent = implode('', $env_lines);
+
+                        return view('install.envText')
+                            ->with(compact('envContent', 'envPath'))
+                            ->with('error', 'Automatic .env creation or migrations failed. Please create the .env file manually using the content below and run migrations. Error: '.$e->getMessage());
+                    }
         } catch (Exception $e) {
             $this->deleteEnv();
 
@@ -308,13 +303,10 @@ class InstallController extends Controller
             $this->installSettings();
 
             //Check if no .env file than redirect back.
-            // Check for the file under app/.env as requested by the workflow.
-            $envPath = base_path('app/.env');
+            $envPath = base_path('.env');
             if (! file_exists($envPath)) {
-                // Inform the user that the expected .env (under /app/.env) hasn't
-                // been created. This message matches the requested wording.
                 return redirect()->route('install.details')
-                    ->with('error', 'Looks like you haven\'t created the .env file /app/.env');
+                    ->with('error', 'Looks like you haven\'t created the .env file '.$envPath);
             }
 
             $this->runArtisanCommands();
@@ -368,13 +360,9 @@ class InstallController extends Controller
                 'ENVATO_EMAIL' => '',
             ], $request->only(['ENVATO_PURCHASE_CODE', 'ENVATO_USERNAME', 'ENVATO_EMAIL']));
 
-            // For update flow, only call the remote check if a purchase code was
-            // submitted. Otherwise skip and allow the update to proceed.
-            if (! empty($input['ENVATO_PURCHASE_CODE'])) {
-                $return = pos_boot(config('app.url'), __DIR__, $input['ENVATO_PURCHASE_CODE'], $input['ENVATO_EMAIL'], $input['ENVATO_USERNAME'], 1);
-                if (! empty($return)) {
-                    return $return;
-                }
+            $return = pos_boot(config('app.url'), __DIR__, $input['ENVATO_PURCHASE_CODE'] ?? '', $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '', 1);
+            if (! empty($return)) {
+                return $return;
             }
 
             //Static version value is passed for 1.2 version.
