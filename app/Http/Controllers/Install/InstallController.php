@@ -214,11 +214,14 @@ class InstallController extends Controller
             }
 
             //pos boot
-            // pos_boot may accept empty strings for envato/email/username. Ensure
-            // we pass string values to avoid undefined index notices.
-            $return = pos_boot($input['APP_URL'], __DIR__, $input['ENVATO_PURCHASE_CODE'] ?? '', $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '');
-            if (! empty($return)) {
-                return $return;
+            // If the user provided a purchase code, verify it via pos_boot.
+            // If they left it blank (common for quick/heroku deploys), skip the
+            // remote license validation so the installer can proceed.
+            if (! empty($input['ENVATO_PURCHASE_CODE'])) {
+                $return = pos_boot($input['APP_URL'], __DIR__, $input['ENVATO_PURCHASE_CODE'], $input['ENVATO_EMAIL'], $input['ENVATO_USERNAME']);
+                if (! empty($return)) {
+                    return $return;
+                }
             }
 
             //Check for activation key
@@ -362,9 +365,13 @@ class InstallController extends Controller
                 'ENVATO_EMAIL' => '',
             ], $request->only(['ENVATO_PURCHASE_CODE', 'ENVATO_USERNAME', 'ENVATO_EMAIL']));
 
-            $return = pos_boot(config('app.url'), __DIR__, $input['ENVATO_PURCHASE_CODE'] ?? '', $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '', 1);
-            if (! empty($return)) {
-                return $return;
+            // For update flow, only call the remote check if a purchase code was
+            // submitted. Otherwise skip and allow the update to proceed.
+            if (! empty($input['ENVATO_PURCHASE_CODE'])) {
+                $return = pos_boot(config('app.url'), __DIR__, $input['ENVATO_PURCHASE_CODE'], $input['ENVATO_EMAIL'], $input['ENVATO_USERNAME'], 1);
+                if (! empty($return)) {
+                    return $return;
+                }
             }
 
             //Static version value is passed for 1.2 version.
