@@ -81,7 +81,19 @@ if (!app()->environment('production')) {
 
 Route::middleware(['setData'])->group(function () {
     Route::get('/', function () {
-        return redirect('/login');
+        // Prefer the named login route when available. If it's not
+        // registered (some installs don't include the Laravel UI auth
+        // controllers), fall back to the 'home' route. If neither exists,
+        // render the welcome view so the root doesn't return a 404.
+        if (\Route::has('login')) {
+            return redirect()->route('login');
+        }
+
+        if (\Route::has('home')) {
+            return redirect()->route('home');
+        }
+
+        return view('welcome');
     });
 
     // Avoid directly calling Auth::routes() because on some deployments the
