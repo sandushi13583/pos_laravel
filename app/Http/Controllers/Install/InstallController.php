@@ -208,34 +208,7 @@ class InstallController extends Controller
                 $msg = '<b>ERROR</b>: Failed to connect to MySQL: '.mysqli_connect_error();
                 $msg .= "<br/>Provide correct details for 'Database Host', 'Database Port', 'Database Name', 'Database Username', 'Database Password'.";
 
-                return redirect()
-                    ->back()
-                    ->with('error', $msg);
-            }
-
-            //pos boot
-            // Only perform license verification if the user provided a purchase
-            // code. If left blank we skip the remote check so quick installs
-            // (or Heroku deployments) can proceed without a license value.
-            if (! empty($input['ENVATO_PURCHASE_CODE'])) {
-                $return = pos_boot($input['APP_URL'], __DIR__, $input['ENVATO_PURCHASE_CODE'], $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '');
-                if (! empty($return)) {
-                    return $return;
-                }
-            }
-
-            //Check for activation key
-            if ($this->macActivationKeyChecker) {
-                $licence_code = $request->get('MAC_LICENCE_CODE');
-                $licence_valid = mac_verify_licence_code($licence_code);
-                if (! $licence_valid) {
-                    return redirect()->back()
-                        ->with('error', 'Invalid Activation Licence Code!!')
-                        ->withInput();
-                    exit('Invalid Purchase Code');
-                }
-
-                $input['MAC_LICENCE_CODE'] = $licence_code;
+                return redirect()->back()->with('error', $msg);
             }
 
             //Get .env file details and write the contents in it.
