@@ -30,8 +30,8 @@
                 </div>
               @endif
 
-              <form class="form" id="details_form" method="post" 
-                      action="{{route('install.postDetails')}}">
+        <form class="form" id="details_form" method="post" 
+          action="{{ route('install.postDetails', [], false) }}">
                   {{ csrf_field() }}
 
                   <h4>Application Details</h4>

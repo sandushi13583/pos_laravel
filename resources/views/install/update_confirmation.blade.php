@@ -27,8 +27,8 @@
                 </div>
               @endif
 
-              <form class="form" id="details_form" method="post" 
-                      action="{{route('install.update')}}">
+        <form class="form" id="details_form" method="post" 
+          action="{{ route('install.update', [], false) }}">
                     {{ csrf_field() }}
 
                     <h4> License Details <small class="text-danger">Make sure to provide correct information from Envato/codecanyon</small></h4>
