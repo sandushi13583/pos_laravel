@@ -19,6 +19,13 @@
                 </div>
               @endif
 
+              {{-- Also accept an $error variable passed directly to the view --}}
+              @isset($error)
+                <div class="alert alert-danger">
+                  {{ $error }}
+                </div>
+              @endisset
+
               @if ($errors->any())
                 <div class="alert alert-danger">
                   <ul>

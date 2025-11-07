@@ -266,14 +266,17 @@ class InstallController extends Controller
                     } catch (\Exception $e) {
                         // If writing .env or running commands failed, delete any partial .env
                         // and show user the generated content with instructions to create it
-                        // manually.
+                        // manually. Flash the error to session so the view's session('error')
+                        // handling will display it.
                         $this->deleteEnv();
 
                         $envContent = implode('', $env_lines);
 
+                        $errorMessage = 'Automatic .env creation or migrations failed. Please create the .env file manually using the content below and run migrations. Error: '.$e->getMessage();
+                        session()->flash('error', $errorMessage);
+
                         return view('install.envText')
-                            ->with(compact('envContent', 'envPath'))
-                            ->with('error', 'Automatic .env creation or migrations failed. Please create the .env file manually using the content below and run migrations. Error: '.$e->getMessage());
+                            ->with(compact('envContent', 'envPath'));
                     }
         } catch (Exception $e) {
             $this->deleteEnv();
