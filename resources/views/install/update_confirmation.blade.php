@@ -36,15 +36,15 @@
 
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="envato_purchase_code">Envato Purchase Code:*</label>
-                            <input type="text" name="ENVATO_PURCHASE_CODE" required class="form-control" id="envato_purchase_code">
+              <label for="envato_purchase_code">Envato Purchase Code:</label>
+              <input type="text" name="ENVATO_PURCHASE_CODE" class="form-control" id="envato_purchase_code">
                         </div>
                     </div>
 
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="envato_username">Envato Username:*</label>
-                            <input type="text" name="ENVATO_USERNAME" required class="form-control" id="envato_username">
+              <label for="envato_username">Envato Username:</label>
+              <input type="text" name="ENVATO_USERNAME" class="form-control" id="envato_username">
                         </div>
                     </div>
 

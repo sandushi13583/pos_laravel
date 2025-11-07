@@ -56,14 +56,14 @@
                 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="envato_purchase_code">Envato Purchase Code:*</label>
-                        <input type="password" name="ENVATO_PURCHASE_CODE" required class="form-control" id="envato_purchase_code">
+            <label for="envato_purchase_code">Envato Purchase Code:</label>
+            <input type="password" name="ENVATO_PURCHASE_CODE" class="form-control" id="envato_purchase_code">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="envato_username">Envato Username:*</label>
-                        <input type="text" name="ENVATO_USERNAME" required class="form-control" id="envato_username">
+            <label for="envato_username">Envato Username:</label>
+            <input type="text" name="ENVATO_USERNAME" class="form-control" id="envato_username">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -139,10 +139,10 @@
                   <div class="clearfix"></div>
 
                   <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="MAIL_FROM_ADDRESS">Default from address:*</label>
-                        <input type="email" class="form-control" id="MAIL_FROM_ADDRESS" name="MAIL_FROM_ADDRESS" placeholder="hello@ultimatepos.com" required>
-                    </div>
+          <div class="form-group">
+            <label for="MAIL_FROM_ADDRESS">Default from address:</label>
+            <input type="email" class="form-control" id="MAIL_FROM_ADDRESS" name="MAIL_FROM_ADDRESS" placeholder="hello@ultimatepos.com">
+          </div>
                   </div>
 
                   <div class="col-md-6">

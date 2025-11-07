@@ -149,10 +149,12 @@ class InstallController extends Controller
             ini_set('max_execution_time', 0);
             ini_set('memory_limit', '512M');
 
+            // Make Envato / mail related fields optional so the installer can proceed
+            // if the user does not want to fill those values right now (useful for
+            // quick deployments or Heroku). Database fields remain required.
             $validatedData = $request->validate(
                 [
                     'APP_NAME' => 'required',
-                    'ENVATO_PURCHASE_CODE' => 'required',
                     'DB_DATABASE' => 'required',
                     'DB_USERNAME' => 'required',
                     'DB_PASSWORD' => 'required',
@@ -161,7 +163,6 @@ class InstallController extends Controller
                 ],
                 [
                     'APP_NAME.required' => 'App Name is required',
-                    'ENVATO_PURCHASE_CODE.required' => 'Envaot Purchase code is required',
                     'DB_DATABASE.required' => 'Database Name is required',
                     'DB_USERNAME.required' => 'Database Username is required',
                     'DB_PASSWORD.required' => 'Database Password is required',
@@ -172,10 +173,30 @@ class InstallController extends Controller
 
             $this->outputLog = new BufferedOutput;
 
-            $input = $request->only(['APP_NAME', 'APP_TITLE', 'DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD', 'ENVATO_PURCHASE_CODE',
-                'ENVATO_EMAIL', 'ENVATO_USERNAME', 'MAIL_MAILER',
-                'MAIL_FROM_ADDRESS', 'MAIL_FROM_NAME', 'MAIL_HOST', 'MAIL_PORT', 'MAIL_ENCRYPTION',
-                'MAIL_USERNAME', 'MAIL_PASSWORD', ]);
+            // Collect input values but ensure defaults exist for optional fields so
+            // accessing the array keys is safe even if the user left them empty.
+            $defaults = [
+                'APP_NAME' => '',
+                'APP_TITLE' => '',
+                'DB_HOST' => '',
+                'DB_PORT' => '',
+                'DB_DATABASE' => '',
+                'DB_USERNAME' => '',
+                'DB_PASSWORD' => '',
+                'ENVATO_PURCHASE_CODE' => '',
+                'ENVATO_EMAIL' => '',
+                'ENVATO_USERNAME' => '',
+                'MAIL_MAILER' => '',
+                'MAIL_FROM_ADDRESS' => '',
+                'MAIL_FROM_NAME' => '',
+                'MAIL_HOST' => '',
+                'MAIL_PORT' => '',
+                'MAIL_ENCRYPTION' => '',
+                'MAIL_USERNAME' => '',
+                'MAIL_PASSWORD' => '',
+            ];
+
+            $input = array_merge($defaults, $request->only(array_keys($defaults)));
 
             $input['APP_DEBUG'] = 'false';
             $input['APP_URL'] = url('/');
@@ -193,7 +214,9 @@ class InstallController extends Controller
             }
 
             //pos boot
-            $return = pos_boot($input['APP_URL'], __DIR__, $input['ENVATO_PURCHASE_CODE'], $input['ENVATO_EMAIL'], $input['ENVATO_USERNAME']);
+            // pos_boot may accept empty strings for envato/email/username. Ensure
+            // we pass string values to avoid undefined index notices.
+            $return = pos_boot($input['APP_URL'], __DIR__, $input['ENVATO_PURCHASE_CODE'] ?? '', $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '');
             if (! empty($return)) {
                 return $return;
             }
@@ -322,8 +345,15 @@ class InstallController extends Controller
             ini_set('max_execution_time', 0);
             ini_set('memory_limit', '512M');
 
-            $input = $request->only(['ENVATO_PURCHASE_CODE', 'ENVATO_USERNAME', 'ENVATO_EMAIL']);
-            $return = pos_boot(config('app.url'), __DIR__, $input['ENVATO_PURCHASE_CODE'], $input['ENVATO_EMAIL'], $input['ENVATO_USERNAME'], 1);
+            // Make sure missing fields are defaulted to empty strings so update can
+            // proceed even if the user left the envato fields blank in the form.
+            $input = array_merge([
+                'ENVATO_PURCHASE_CODE' => '',
+                'ENVATO_USERNAME' => '',
+                'ENVATO_EMAIL' => '',
+            ], $request->only(['ENVATO_PURCHASE_CODE', 'ENVATO_USERNAME', 'ENVATO_EMAIL']));
+
+            $return = pos_boot(config('app.url'), __DIR__, $input['ENVATO_PURCHASE_CODE'] ?? '', $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '', 1);
             if (! empty($return)) {
                 return $return;
             }
