@@ -214,11 +214,14 @@ class InstallController extends Controller
             }
 
             //pos boot
-            // pos_boot may accept empty strings for envato/email/username. Ensure
-            // we pass string values to avoid undefined index notices.
-            $return = pos_boot($input['APP_URL'], __DIR__, $input['ENVATO_PURCHASE_CODE'] ?? '', $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '');
-            if (! empty($return)) {
-                return $return;
+            // Only perform license verification if the user provided a purchase
+            // code. If left blank we skip the remote check so quick installs
+            // (or Heroku deployments) can proceed without a license value.
+            if (! empty($input['ENVATO_PURCHASE_CODE'])) {
+                $return = pos_boot($input['APP_URL'], __DIR__, $input['ENVATO_PURCHASE_CODE'], $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '');
+                if (! empty($return)) {
+                    return $return;
+                }
             }
 
             //Check for activation key
@@ -363,9 +366,12 @@ class InstallController extends Controller
                 'ENVATO_EMAIL' => '',
             ], $request->only(['ENVATO_PURCHASE_CODE', 'ENVATO_USERNAME', 'ENVATO_EMAIL']));
 
-            $return = pos_boot(config('app.url'), __DIR__, $input['ENVATO_PURCHASE_CODE'] ?? '', $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '', 1);
-            if (! empty($return)) {
-                return $return;
+            // For updates too, only call pos_boot if a purchase code was entered.
+            if (! empty($input['ENVATO_PURCHASE_CODE'])) {
+                $return = pos_boot(config('app.url'), __DIR__, $input['ENVATO_PURCHASE_CODE'], $input['ENVATO_EMAIL'] ?? '', $input['ENVATO_USERNAME'] ?? '', 1);
+                if (! empty($return)) {
+                    return $return;
+                }
             }
 
             //Static version value is passed for 1.2 version.
