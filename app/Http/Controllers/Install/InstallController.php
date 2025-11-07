@@ -308,11 +308,11 @@ class InstallController extends Controller
             $this->installSettings();
 
             //Check if no .env file than redirect back.
-            $envPath = base_path('.env');
+            // Check for the file under app/.env as requested by the workflow.
+            $envPath = base_path('app/.env');
             if (! file_exists($envPath)) {
-                // Inform the user that the expected .env (under /app/.env in this
-                // workflow) hasn't been created. Use the literal path requested by
-                // the user to make the message explicit.
+                // Inform the user that the expected .env (under /app/.env) hasn't
+                // been created. This message matches the requested wording.
                 return redirect()->route('install.details')
                     ->with('error', 'Looks like you haven\'t created the .env file /app/.env');
             }
