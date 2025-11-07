@@ -94,7 +94,10 @@ class AppServiceProvider extends ServiceProvider
         View::composer(
             ['layouts.*'],
             function ($view) {
-                if (isAppInstalled()) {
+                // Only attempt to read settings from DB if app appears installed
+                // and the `system` table exists. This avoids exceptions during
+                // initial installation when migrations haven't run yet.
+                if (isAppInstalled() && Schema::hasTable('system')) {
                     $keys = ['additional_js', 'additional_css'];
                     $__system_settings = System::getProperties($keys, true);
 
