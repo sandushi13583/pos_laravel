@@ -76,7 +76,7 @@ include_once 'install_r.php';
 
 Route::middleware(['setData'])->group(function () {
     Route::get('/', function () {
-        return view('welcome');
+        return redirect('/login');
     });
 
     // Avoid directly calling Auth::routes() because on some deployments the
