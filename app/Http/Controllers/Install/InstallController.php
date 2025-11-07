@@ -249,24 +249,33 @@ class InstallController extends Controller
                 }
             }
 
-            //TODO: Remove false & automate the process of creating .env file.
-            if (false) {
-                // $fp = fopen($envPath, 'w');
-                // fwrite($fp, implode('', $env_lines));
-                // fclose($fp);
+            // Automate the process of creating the .env file, running migrations,
+            // and redirecting to the success page. If writing the .env fails,
+            // fall back to showing the env text so the user can copy it manually.
+            $envContent = implode('', $env_lines);
 
-                // //Artisan commands
-                // $this->runArtisanCommands();
+            try {
+                // Write the .env file
+                $fp = fopen($envPath, 'w');
+                if ($fp === false) {
+                    // Could not open file for writing. Show env text as fallback.
+                    throw new \Exception('Unable to open .env for writing.');
+                }
+                fwrite($fp, $envContent);
+                fclose($fp);
 
-                // return redirect()->route('install.success');
-            } else {
+                // Run migrations/seeds and other setup commands
+                $this->runArtisanCommands();
+
+                return redirect()->route('install.success');
+            } catch (\Exception $e) {
+                // If anything failed (permission, DB, etc.) remove any partial .env
+                // and show the env contents so the user can create the file manually.
                 $this->deleteEnv();
 
-                //Show intermediate steps if not able to copy file.
-                $envContent = implode('', $env_lines);
-
                 return view('install.envText')
-                    ->with(compact('envContent', 'envPath'));
+                    ->with(compact('envContent', 'envPath'))
+                    ->with('error', $e->getMessage());
             }
         } catch (Exception $e) {
             $this->deleteEnv();
