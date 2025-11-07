@@ -72,43 +72,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Load install routes only when not running in production. This prevents the
-// installation/update screens from being accessible on production deployments
-// (for example Heroku). In production, install routes are disabled.
-if (!app()->environment('production')) {
-    include_once base_path('routes/install_r.php');
-} else {
-    // Extra safety: in production explicitly redirect any request to install
-    // related paths to the login/home page. This prevents any installed app
-    // from accidentally exposing installation/update pages.
-    Route::any('/install{any?}', function () {
-        if (\Route::has('login')) {
-            return redirect()->route('login');
-        }
-
-        if (\Route::has('home')) {
-            return redirect()->route('home');
-        }
-
-        return redirect('/');
-    })->where('any', '.*');
-}
+include_once 'install_r.php';
 
 Route::middleware(['setData'])->group(function () {
     Route::get('/', function () {
-        // Prefer the named login route when available. If it's not
-        // registered (some installs don't include the Laravel UI auth
-        // controllers), fall back to the 'home' route. If neither exists,
-        // render the welcome view so the root doesn't return a 404.
-        if (\Route::has('login')) {
-            return redirect()->route('login');
-        }
-
-        if (\Route::has('home')) {
-            return redirect()->route('home');
-        }
-
-        return view('welcome');
+        return redirect('/login');
     });
 
     // Avoid directly calling Auth::routes() because on some deployments the
