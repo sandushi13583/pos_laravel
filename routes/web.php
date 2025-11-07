@@ -72,7 +72,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-include_once 'install_r.php';
+// Load install routes only when not running in production. This prevents the
+// installation/update screens from being accessible on production deployments
+// (for example Heroku). In production, install routes are disabled.
+if (!app()->environment('production')) {
+    include_once base_path('routes/install_r.php');
+}
 
 Route::middleware(['setData'])->group(function () {
     Route::get('/', function () {
