@@ -259,8 +259,9 @@ class InstallController extends Controller
                         fwrite($fp, implode('', $env_lines));
                         fclose($fp);
 
-                        // Generate APP_KEY
-                        Artisan::call('key:generate');
+                        // Generate APP_KEY non-interactively so the web request doesn't
+                        // block waiting for STDIN. Use --force and --no-interaction.
+                        Artisan::call('key:generate', ['--force' => true, '--no-interaction' => true]);
 
                         // Run migrations and seed
                         $this->runArtisanCommands();
