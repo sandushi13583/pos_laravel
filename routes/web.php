@@ -77,6 +77,21 @@ use Illuminate\Support\Facades\Route;
 // (for example Heroku). In production, install routes are disabled.
 if (!app()->environment('production')) {
     include_once base_path('routes/install_r.php');
+} else {
+    // Extra safety: in production explicitly redirect any request to install
+    // related paths to the login/home page. This prevents any installed app
+    // from accidentally exposing installation/update pages.
+    Route::any('/install{any?}', function () {
+        if (\Route::has('login')) {
+            return redirect()->route('login');
+        }
+
+        if (\Route::has('home')) {
+            return redirect()->route('home');
+        }
+
+        return redirect('/');
+    })->where('any', '.*');
 }
 
 Route::middleware(['setData'])->group(function () {
