@@ -58,8 +58,12 @@ class InstallController extends Controller
      */
     private function isInstalled()
     {
+        // Consider the app installed only when a .env exists AND the
+        // APP_INSTALLED flag is set to true. This allows the installer to
+        // run on environments where a .env is present but installation has
+        // not completed (useful for CI/Heroku or when a sample .env exists).
         $envPath = base_path('.env');
-        if (file_exists($envPath)) {
+        if (file_exists($envPath) && env('APP_INSTALLED', 'false') === 'true') {
             abort(404);
         }
     }
@@ -223,6 +227,19 @@ class InstallController extends Controller
                         $env_lines[$key] = $index.'="'.$value.'"'.PHP_EOL;
                     }
                 }
+            }
+
+            // Ensure APP_INSTALLED is set to true once installer writes the .env
+            $found_installed = false;
+            foreach ($env_lines as $key => $line) {
+                if (strpos($line, 'APP_INSTALLED') !== false) {
+                    $env_lines[$key] = 'APP_INSTALLED="true"'.PHP_EOL;
+                    $found_installed = true;
+                    break;
+                }
+            }
+            if (! $found_installed) {
+                $env_lines[] = 'APP_INSTALLED="true"'.PHP_EOL;
             }
 
             //TODO: Remove false & automate the process of creating .env file.
